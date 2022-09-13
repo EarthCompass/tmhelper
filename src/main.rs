@@ -11,14 +11,11 @@ struct UrlMapState {
 
 #[get("/openid/{openid}")]
 async fn hello(openid: web::Path<String>,data: web::Data<UrlMapState>) -> impl Responder {
-    // println!("{:?}",tmsign::get_sign().await.unwrap());
     log::info!("incoming openid: {}", openid);
     let sign = tmsign::get_sign(openid.to_string()).await;
     if sign.is_ok() {
         let sign_event = sign.unwrap();
         task::spawn(
-            // time::sleep(time::Duration::from_secs(5)).await;
-            // println!("Hello from blocking task");
             tmsign::qrsign(sign_event.clone(),data.url_map.clone()),
         );
         return HttpResponse::Ok().body(format!("{}/{}", sign_event.course_id, sign_event.sign_id));
@@ -32,7 +29,6 @@ async fn redirect(info: web::Path<(String,String)>,data: web::Data<UrlMapState>)
     let qr_channel = format!("{}/{}", info.0, info.1);
     let map = data.url_map.lock().await;
     let url = map.get(&qr_channel);
-    // println!("{}",qr_channel);
     if url.is_some() {
         log::info!("redirect: {}->{}", qr_channel,url.unwrap());
         return HttpResponse::Found().append_header(("Location", url.unwrap().as_str())).finish();

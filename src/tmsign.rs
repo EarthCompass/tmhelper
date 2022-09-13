@@ -92,9 +92,6 @@ impl<'a> QrSign {
     }
 
     pub async fn handle_msg(mut self,urlmap:Arc<Mutex<HashMap<String, String>>>) {
-        // while let Some(message) = self.read.next().await {
-
-        // }
         let state = self.state.lock().await;
         let mut interval = time::interval(Duration::from_millis(7500));
         let mut cnt = 0;
@@ -109,16 +106,13 @@ impl<'a> QrSign {
 					}
 
                     let data = msg.into_text().unwrap();
-                    // println!("{:?}",data);
                     let vs: Value = serde_json::from_str(&data).unwrap();
                     if !vs.is_array() || vs.as_array().unwrap().len() == 0 {
                         continue 'lp;
                     }
                     let v = &vs[0];
-                    // println!("data: {}", data);
                     match v["channel"].as_str() {
                         Some("/meta/handshake") => {
-                            // clientid = v["clientId"].as_str().unwrap().to_string();
                             log::info!("clientid: {}", v["clientId"].as_str().unwrap().to_string());
                             self.state.lock().await.clientid = v["clientId"].as_str().unwrap().to_string();
                             self.connect().await;
@@ -177,13 +171,11 @@ impl<'a> QrSign {
             .unwrap();
     }
     pub async fn heartbeat(&mut self) {
-        // loop {
         self.write
             .send(Message::Text("[]".to_string()))
             .await
             .unwrap();
         self.connect().await;
-        // }
     }
 }
 
@@ -202,7 +194,6 @@ pub async fn get_sign(openid: String) -> Result<SignEvent, Box<dyn std::error::E
     if signs.len() == 0 {
         return Err("no sign".into());
     }
-	//iter all items in signs
 	for sign in signs.iter(){
 		if sign.is_qr == 1{
 			return Ok(sign.clone());
