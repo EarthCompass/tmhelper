@@ -1,0 +1,17 @@
+[package]
+name = "tmhelper"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+actix-web = "4"
+log = "0.4"
+tokio = { version="*",features=["macros"]}
+tokio-tungstenite = { version = "*", features = ["rustls-tls-native-roots"] }
+futures = "0.3"
+serde = { version = "*", features = ["derive"] }
+serde_json = "*"
+reqwest = { version = "*", features = ["blocking","json","rustls-tls-native-roots"] }
+env_logger = "*"
